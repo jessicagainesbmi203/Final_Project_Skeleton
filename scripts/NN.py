@@ -34,6 +34,8 @@ class NeuralNetwork:
             bias_correction_matrix = np.zeros((self.a.get(layer).shape[0],weight_matrix.shape[1]))
             self.biases[layer] = bias_matrix
             self.bias_correction[layer] = bias_correction_matrix
+        print('starting weights')
+        print(self.weights)
     def feedforward(self):
         for layer in range(1,len(self.shape),1):
             z = np.dot(self.a.get(layer),self.weights.get(layer)) + self.biases.get(layer)
@@ -43,6 +45,8 @@ class NeuralNetwork:
                 for j in range(a.shape[1]):
                     a[i,j] = activation(z[i,j], self.activation)
             self.a[layer+1] = a
+        print('a')
+        print(self.a)
     def backprop(self):
         deltas = dict()
         last_layer = len(self.shape)
@@ -51,6 +55,8 @@ class NeuralNetwork:
             for j in range(f_prime_z.shape[1]):
                 f_prime_z[i,j] = der_activation(self.z.get(last_layer)[i,j],self.activation)
         delta_output = np.multiply(-(self.outputs-self.a.get(last_layer)),f_prime_z)
+        print('delta output')
+        print(delta_output)
         deltas[last_layer] = delta_output
         # gradient of cost function for hidden layers (all but first and last)
         for layer in range(len(self.shape)-1,1,-1):
@@ -60,14 +66,16 @@ class NeuralNetwork:
                     f_prime_z[i,j] = der_activation(self.z.get(layer)[i,j],self.activation)
             delta_layer = np.multiply(np.dot(deltas[layer+1],np.transpose(self.weights.get(layer))),f_prime_z)
             deltas[layer] = delta_layer
+            print('delta hidden layer')
+            print(delta_layer)
         for layer in range(1,len(self.shape),1):
             gradient_W = np.dot(np.transpose(self.a.get(layer)),deltas.get(layer+1))
             gradient_b = deltas[layer+1]
             self.weight_correction[layer] = self.weight_correction.get(layer) + gradient_W
             self.bias_correction[layer] = self.bias_correction.get(layer) + gradient_b
             m = self.inputs.shape[0]
-            new_weights = self.weights.get(layer) - self.lr * (((1/m) * self.weight_correction[layer])+ self.lamda * self.weights[layer])
-            new_biases = self.biases[layer] - self.lr * ((1/m) * self.bias_correction[layer])
+            new_weights = self.weights.get(layer) + self.lr * (((1/m) * self.weight_correction[layer])+ self.lamda * self.weights[layer])
+            new_biases = self.biases[layer] + self.lr * ((1/m) * self.bias_correction[layer])
     def fit(self):
         self.make_weights()
         for i in range(self.iter):
@@ -77,6 +85,7 @@ class NeuralNetwork:
         print(self.weights)
     def predict(self):
         self.feedforward()
+        print('predicted outputs')
         print(self.a)
         
 def activation(x,type):
