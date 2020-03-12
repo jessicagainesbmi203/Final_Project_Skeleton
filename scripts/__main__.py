@@ -17,6 +17,6 @@ for i in range(8):
     test_input[i,i] = 1
     
 
-neural_net = NeuralNetwork(inputs=test_input,outputs=test_input,iter=1)
+neural_net = NeuralNetwork(inputs=test_input,outputs=test_input,iter=10)
 neural_net.fit()
 neural_net.predict()

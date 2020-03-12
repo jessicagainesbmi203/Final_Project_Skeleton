@@ -53,29 +53,46 @@ class NeuralNetwork:
         f_prime_z = np.zeros((self.z.get(last_layer).shape[0],self.z.get(last_layer).shape[1]))
         for i in range(f_prime_z.shape[0]):
             for j in range(f_prime_z.shape[1]):
-                f_prime_z[i,j] = der_activation(self.z.get(last_layer)[i,j],self.activation)
-        delta_output = np.multiply(-(self.outputs-self.a.get(last_layer)),f_prime_z)
-        print('delta output')
+                z = np.dot(np.transpose(self.weights.get(last_layer-1)),np.transpose(self.a.get(last_layer-1)))
+                f_prime_z[i,j] = der_activation(z[i,j],self.activation)
+                print('activation of z[i,j]')
+                print(activation(z[i,j],'sigmoid'))
+        print('error')
+        print(self.a.get(last_layer) - self.outputs)
+        delta_output = np.multiply(np.transpose(self.a.get(last_layer) - self.outputs),f_prime_z)
+        print('weighted error')
         print(delta_output)
         deltas[last_layer] = delta_output
         # gradient of cost function for hidden layers (all but first and last)
         for layer in range(len(self.shape)-1,1,-1):
-            f_prime_z = np.zeros((self.z.get(layer).shape[0],self.z.get(layer).shape[1]))
+            print(layer)
+            z = np.dot(np.transpose(self.weights.get(layer-1)), np.transpose(self.a.get(layer-1)))
+            f_prime_z = np.zeros((z.shape[0],z.shape[1]))
             for i in range(f_prime_z.shape[0]):
                 for j in range(f_prime_z.shape[1]):
-                    f_prime_z[i,j] = der_activation(self.z.get(layer)[i,j],self.activation)
-            delta_layer = np.multiply(np.dot(deltas[layer+1],np.transpose(self.weights.get(layer))),f_prime_z)
+                    f_prime_z[i,j] = der_activation(z[i,j],self.activation)
+            delta_layer = np.multiply((np.dot(self.weights.get(layer),deltas[layer+1])),f_prime_z)
             deltas[layer] = delta_layer
             print('delta hidden layer')
             print(delta_layer)
         for layer in range(1,len(self.shape),1):
-            gradient_W = np.dot(np.transpose(self.a.get(layer)),deltas.get(layer+1))
-            gradient_b = deltas[layer+1]
+            gradient_W = np.transpose(np.dot(deltas.get(layer+1),self.a.get(layer)))
+            print('gradient_W')
+            print(gradient_W)
+            gradient_b = np.transpose(deltas[layer+1])
+            print('gradient_b')
+            print(gradient_b)
             self.weight_correction[layer] = self.weight_correction.get(layer) + gradient_W
             self.bias_correction[layer] = self.bias_correction.get(layer) + gradient_b
+            print('weight_correction')
+            print(self.weight_correction)
+            print('bias_correction')
+            print(self.bias_correction)
             m = self.inputs.shape[0]
             new_weights = self.weights.get(layer) + self.lr * (((1/m) * self.weight_correction[layer])+ self.lamda * self.weights[layer])
             new_biases = self.biases[layer] + self.lr * ((1/m) * self.bias_correction[layer])
+            self.weights[layer] = new_weights
+            self.biases[layer] = new_biases
     def fit(self):
         self.make_weights()
         for i in range(self.iter):
