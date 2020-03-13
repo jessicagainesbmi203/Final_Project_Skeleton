@@ -55,8 +55,6 @@ class NeuralNetwork:
             for j in range(f_prime_z.shape[1]):
                 z = np.dot(np.transpose(self.weights.get(last_layer-1)),np.transpose(self.a.get(last_layer-1)))
                 f_prime_z[i,j] = der_activation(z[i,j],self.activation)
-                print('activation of z[i,j]')
-                print(activation(z[i,j],'sigmoid'))
         print('error')
         print(self.a.get(last_layer) - self.outputs)
         delta_output = np.multiply(np.transpose(self.a.get(last_layer) - self.outputs),f_prime_z)
