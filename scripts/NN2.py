@@ -11,7 +11,7 @@ np.random.seed(1)
 
 
 class NN:
-    def __init__(self, shape):
+    def __init__(self, shape=(8,3,8)):
         """
         Initialize the neural network by creating empty arrays for values that will be 
         calculated later, and set initial weights and biases to small random values.
@@ -42,7 +42,6 @@ class NN:
         """
         self.a = [x.T]  # a[0] is the input for layer 1 (layer 0 is the input layer)
         self.z = [None]
-        
         for (weight, bias) in zip(self.weight, self.bias):
             # apply weights and biases to the inputs of each layer
             self.z.append(weight.dot(self.a[-1]) + bias)
@@ -112,7 +111,8 @@ class NN:
             verbose: whether to print updates on error during the training process
         Outputs: loss : the sum of squared error over the course of the training process
         """
-        min_error = 1e-5
+        min_change = 0.5
+        prev_error = 0
         loss = []
         for i in range(iterations + 1):
             error = self.back_propagation(x, y, learning_rate=learning_rate, momentum=momentum)
@@ -120,10 +120,12 @@ class NN:
             if verbose:
                 if i % 2500 == 0:
                     print("iteration {:5d} error: {:0.6f}".format(i, error))
-                if error <= min_error:
+                # stop criterion
+                pct_change = ((prev_error-error) / prev_error) * 100
+                if pct_change <= min_change:
                     print("minimum error {} reached at iteration {}".format(min_error, i))
                     break
-
+            prev_error = error
         return loss
         
 def activation(x,derivative=False):

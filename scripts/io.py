@@ -71,8 +71,31 @@ def flatten_inputs(inputs):
         flattened_list.append(a)
     return flattened_list
 
-
-
+def encode_data(filepath_pos,filepath_neg):
+    """
+    Read in sequences with positive and negative labels and use one-hot
+        encoding to quanitfy them in preparation for neural network learning_rate
+    Inputs: filepath_pos : filepath containing sequences with positive labels
+        filepath_neg : filepath containing sequences with negative labels
+    Output: flat_pos: a list of 1d vectors containgin all features of the observations with positive labels
+        flat_neg: a list of 1d vectors containing all features of the observations with negative labels
+    """
+    # read in positives and negatives
+    positives = read_positives(filepath_pos)
+    negatives = read_negatives(filepath_neg)
+    # balance positives and negatives to the same length
+    pos_sample,neg_sample = balance_inputs(positives, negatives)
+    # one-hot encoding
+    one_hot_pos = list()
+    for sample in pos_sample:
+        one_hot_pos.append(one_hot_encoding(sample))
+    flat_pos = flatten_inputs(one_hot_pos)
+    one_hot_neg = list()
+    for sample in neg_sample:
+        one_hot_neg.append(one_hot_encoding(sample))
+    # flatten one-hot encoded samples into 1d arrays
+    flat_neg = flatten_inputs(one_hot_neg)
+    return flat_pos,flat_neg
 
 
 
