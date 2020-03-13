@@ -1,4 +1,4 @@
-from scripts import NN2
+from scripts.NN2 import NN
 
 def test_encoder():
     network = NN((8,3,8))
