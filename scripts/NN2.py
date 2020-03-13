@@ -3,10 +3,7 @@
 # my own neural network code did not learn : see /scripts/NN.py
 
 # Fully configurable neural network in numpy
-#
-# Usage: NN(shape_tuple, activation_tuple)
-# shape_tuple: (nodes_in_input_layer, nodes_in_hidden_layer_1, ..., nodes_in_output_layer)
-# activation_tuple: (None, activation_function_for_hidden_layer_1, ..., activation_function_for_output_layer)
+
 import numpy as np
 
 np.set_printoptions(formatter={"float": "{: 0.3f}".format}, linewidth=np.inf)
@@ -15,19 +12,19 @@ np.random.seed(1)
 
 class NN:
     def __init__(self, shape):
-    """
-    Initialize the neural network by creating empty arrays for values that will be 
-    calculated later, and set initial weights and biases to small random values.
-    Input: shape : a tuple with the number of nodes in each layer
-    """
+        """
+        Initialize the neural network by creating empty arrays for values that will be 
+        calculated later, and set initial weights and biases to small random values.
+        Input: shape : a tuple with the number of nodes in each layer
+        """
         self.num_layers = len(shape) - 1  # the input layer does not count as a layer
         self.weight = []
         self.bias = []
 
-        self.a = []  # layers output after activation, input to the next layer
-        self.z = []  # layers results before activation
-        self.dw = []  # empty array used for weight update during training
-        self.db = []  # empty array used for bias update during training
+        self.a = []  # output of each layer
+        self.z = []  # output of each layer before the activation function is applied
+        self.dw = []  # weight correction matrix
+        self.db = []  # bias correction matrix
 
         # initialize weights and biases and their corresponding update matrices to the appropriate sizes
         # give initial weights and biases small random values
@@ -38,11 +35,11 @@ class NN:
             self.db.append(np.zeros((layer2, 1)))
 
     def forward(self, x):
-    """
-    Feed-forward part of the algorithm in which a prediction is calculated
-    Input: training data, a matrix of features and observations
-    Output: matrix of predictions
-    """
+        """
+        Feed-forward part of the algorithm in which a prediction is calculated
+        Input: training data, a matrix of features and observations
+        Output: matrix of predictions
+        """
         self.a = [x.T]  # a[0] is the input for layer 1 (layer 0 is the input layer)
         self.z = [None]
         
@@ -55,15 +52,15 @@ class NN:
         return self.a[-1].T # prediction (output of last layer)
 
     def back_propagation(self, x, y, learning_rate=0.1, momentum=0.5):
-    """
-    Use weighted errors to adjust weights and biases
-    Inputs: x : training data features and observations
-        y: training data classification associated with each observations
-        learning rate: factor controlling how much the weights change with each iteration
-        momentum: factor controlling how much impact is given to the current values in the weight and 
-            bias update matrices during adjustment
-    Output: error: sum of the squared difference between predicted given outputs
-    """
+        """
+        Use weighted errors to adjust weights and biases
+        Inputs: x : training data features and observations
+            y: training data classification associated with each observations
+            learning rate: factor controlling how much the weights change with each iteration
+            momentum: factor controlling how much impact is given to the current values in the weight and 
+                bias update matrices during adjustment
+        Output: error: sum of the squared difference between predicted given outputs
+        """
         # number of training examples
         m = x.shape[0]
         delta_w = []
@@ -104,20 +101,19 @@ class NN:
         return error
 
     def train(self, x, y, iterations=10000, learning_rate=0.2, momentum=0.5, verbose=True):
-    """
-    Repeatedly predict, calculate error, and adjust weights accordingly to train a model according to a set of observations
-    Inputs: x : training data features and observations
-        y: training data classification associated with each observations
-        iterations : the number of repetitions of updating weights
-        learning rate: factor controlling how much the weights change with each iteration
-        momentum: factor controlling how much impact is given to the current values in the weight and 
-            bias update matrices during adjustment
-        verbose: whether to print updates on error during the training process
-    Outputs: loss : the sum of squared error over the course of the training process
-    """
+        """
+        Repeatedly predict, calculate error, and adjust weights accordingly to train a model according to a set of observations
+        Inputs: x : training data features and observations
+            y: training data classification associated with each observations
+            iterations : the number of repetitions of updating weights
+            learning rate: factor controlling how much the weights change with each iteration
+            momentum: factor controlling how much impact is given to the current values in the weight and 
+                bias update matrices during adjustment
+            verbose: whether to print updates on error during the training process
+        Outputs: loss : the sum of squared error over the course of the training process
+        """
         min_error = 1e-5
         loss = []
-
         for i in range(iterations + 1):
             error = self.back_propagation(x, y, learning_rate=learning_rate, momentum=momentum)
             loss.append(error)
@@ -131,7 +127,9 @@ class NN:
         return loss
         
 def activation(x,derivative=False):
-        # sigmoid activation function
+        """
+        sigmoid activation function
+        """
         if derivative:
             return (activation(x,False)*(1-activation(x,False)))
         else:

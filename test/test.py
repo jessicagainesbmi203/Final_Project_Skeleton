@@ -1,10 +1,9 @@
-from scripts import NN
+from scripts import NN2
 
 def test_encoder():
-    assert 1 == 1
-
-def test_encoder_relu():
-    assert 1 == 1
-
-def test_one_d_ouput():
-    assert 1 == 1
+    network = NN((8,3,8))
+    X = np.identity(8)
+    Y = np.identity(8)
+    network.train(X, Y, 15000, learning_rate=0.2)
+    Y_hat = network.forward(X)
+    assert np.round(Y_hat) == Y

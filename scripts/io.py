@@ -64,6 +64,12 @@ def one_hot_encoding(sequence):
         i += 1
     return encoded
 
+def flatten_inputs(inputs):
+    flattened_list = list()
+    for array in inputs:
+        a = array.flatten()
+        flattened_list.append(a)
+    return flattened_list
 
 
 

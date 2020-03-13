@@ -51,9 +51,9 @@ class NeuralNetwork:
         deltas = dict()
         last_layer = len(self.shape)
         f_prime_z = np.zeros((self.z.get(last_layer).shape[0],self.z.get(last_layer).shape[1]))
+        z = np.dot(np.transpose(self.weights.get(last_layer-1)),np.transpose(self.a.get(last_layer-1)))
         for i in range(f_prime_z.shape[0]):
             for j in range(f_prime_z.shape[1]):
-                z = np.dot(np.transpose(self.weights.get(last_layer-1)),np.transpose(self.a.get(last_layer-1)))
                 f_prime_z[i,j] = der_activation(z[i,j],self.activation)
         print('error')
         print(self.a.get(last_layer) - self.outputs)
