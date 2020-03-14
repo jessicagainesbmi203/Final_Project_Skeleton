@@ -111,8 +111,7 @@ class NN:
             verbose: whether to print updates on error during the training process
         Outputs: loss : the sum of squared error over the course of the training process
         """
-        min_change = 0.5
-        prev_error = 0
+        min_error = 0.5
         loss = []
         for i in range(iterations + 1):
             error = self.back_propagation(x, y, learning_rate=learning_rate, momentum=momentum)
@@ -120,12 +119,10 @@ class NN:
             if verbose:
                 if i % 2500 == 0:
                     print("iteration {:5d} error: {:0.6f}".format(i, error))
-                # stop criterion
-                pct_change = ((prev_error-error) / prev_error) * 100
-                if pct_change <= min_change:
+                # if error changes less than 0.5% in 100 trials, then stop
+                if error <= min_error:
                     print("minimum error {} reached at iteration {}".format(min_error, i))
                     break
-            prev_error = error
         return loss
         
 def activation(x,derivative=False):

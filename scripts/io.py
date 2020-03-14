@@ -97,6 +97,15 @@ def encode_data(filepath_pos,filepath_neg):
     flat_neg = flatten_inputs(one_hot_neg)
     return flat_pos,flat_neg
 
+def write_results(filepath, sequences, predictions):
+    basename = os.path.basename(filepath)
+    name = os.path.splitext(basename)
+    if name[1] != ".txt":
+        raise IOError("%s is not a txt file"%filepath)
+    # open txt file
+    with open(filepath, "w") as f:
+        for (seq, pred) in zip(sequences,predictions):
+            f.write(seq + "\t" + str(pred[0]) + '\n')
 
 
 

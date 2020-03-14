@@ -77,7 +77,7 @@ def k_fold_learning_rate(k,sets):
             inputs = training_data[0]
             outputs = training_data[1]
             # train model on training data
-            losses = neural_net.train(inputs,outputs,50000,learning_rate=lr)
+            losses = neural_net.train(inputs,outputs,100000,learning_rate=lr)
             training_error_sum += losses[-1]
             # use model to predict on test data
             inputs = test_data[0]
@@ -91,3 +91,75 @@ def k_fold_learning_rate(k,sets):
         testing_error_avg = testing_error_sum / k
         testing_error_list.append(testing_error_avg)
     return (learning_rates,training_error_list,testing_error_list)
+    
+def k_fold_hidden_nodes(k,sets):
+    """
+    Use k fold cross validation to choose a value for the number of nodes in the hidden layer
+    Inputs: k : the number of data splits to test
+        filepath_pos : filepath containing sequences with positive labels
+        filepath_neg : filepath containing sequences with negative labels
+    Outputs: learning_rates : list of all learning rates tested
+        training_error: a list of the average error based on training data for each learning rate 
+        testing_error: a list of the average error based on the test data for each learning rate
+    """
+    n_nodes = [20,40,60,80]
+    training_error_list = list()
+    testing_error_list = list()
+    for n in n_nodes:
+        testing_error_sum = 0
+        training_error_sum = 0
+        for split in sets:
+            training_data = split[0]
+            test_data = split[1]
+            n_features = training_data[0].shape[1]
+            neural_net = NN((n_features,n,1))
+            inputs = training_data[0]
+            outputs = training_data[1]
+            # train model on training data
+            losses = neural_net.train(inputs,outputs,100000,learning_rate=0.2)
+            training_error_sum += losses[-1]
+            # use model to predict on test data
+            inputs = test_data[0]
+            outputs = test_data[1]
+            y_hat = neural_net.forward(inputs)
+            # calculate error for trained model on test data
+            testing_error = np.sum((y_hat - outputs) ** 2)
+            testing_error_sum += testing_error
+        training_error_avg = training_error_sum / k
+        training_error_list.append(training_error_avg)
+        testing_error_avg = testing_error_sum / k
+        testing_error_list.append(testing_error_avg)
+    return (n_nodes,training_error_list,testing_error_list)
+    
+def k_fold_eval(k,sets):
+    """
+    Use k fold cross validation to choose a value for the number of nodes in the hidden layer
+    Inputs: k : the number of data splits to test
+        filepath_pos : filepath containing sequences with positive labels
+        filepath_neg : filepath containing sequences with negative labels
+    Outputs: learning_rates : list of all learning rates tested
+        training_error: a list of the average error based on training data for each learning rate 
+        testing_error: a list of the average error based on the test data for each learning rate
+    """
+    testing_error_sum = 0
+    training_error_sum = 0
+    for split in sets:
+        training_data = split[0]
+        test_data = split[1]
+        n_features = training_data[0].shape[1]
+        neural_net = NN((n_features,20,1))
+        inputs = training_data[0]
+        outputs = training_data[1]
+        # train model on training data
+        losses = neural_net.train(inputs,outputs,100000,learning_rate=0.2)
+        training_error_sum += losses[-1]
+        # use model to predict on test data
+        inputs = test_data[0]
+        outputs = test_data[1]
+        y_hat = neural_net.forward(inputs)
+        # calculate error for trained model on test data
+        testing_error = np.sum((y_hat - outputs) ** 2)
+        testing_error_sum += testing_error
+    training_error_avg = training_error_sum / k
+    testing_error_avg = testing_error_sum / k
+    return (training_error_avg,testing_error_avg)
